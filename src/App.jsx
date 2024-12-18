@@ -6,23 +6,21 @@ import { Link } from "react-router-dom"
 function App() {
   const [data, setData] = useState([])
   const searchRef = useRef()
-  const [inputResult, setInputResult] = useState()
+  const [filteredData, setFilteredData] = useState([])
 
   useEffect(() => {
     async function getData() {
       const response = await axios.get("https://jsonplaceholder.typicode.com/posts")
       setData(response.data)
+      setFilteredData(response.data)
     }
     getData()
   }, [])
 
-  async function onSearchTitle() {
-    console.log(searchRef.current.value)
-    const response = await axios.get(
-      `https://jsonplaceholder.typicode.com/posts/${searchRef.current.value}`
-    )
-    const result = response.data
-    setInputResult(result)
+  function onSearchTitle() {
+    const searchValue = searchRef.current.value.toLowerCase()
+    const filtered = data.filter((item) => item.title.toLowerCase().includes(searchValue))
+    setFilteredData(filtered)
   }
 
   return (
@@ -36,10 +34,10 @@ function App() {
         </div>
 
         <div>
-          {data.map((item) => (
+          {filteredData.map((item) => (
             <React.Fragment key={item.id}>
               <Link to={`/posts/${item.id}`}>
-                <p key={item.id}>
+                <p>
                   {item.id} - {item.title}
                 </p>
               </Link>
@@ -52,10 +50,3 @@ function App() {
 }
 
 export default App
-
-// {
-//   "userId": 1,
-//   "id": 1,
-//   "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-//   "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
-// },
